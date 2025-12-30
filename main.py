@@ -1,6 +1,15 @@
 import pygame
 from pytmx.util_pygame import load_pygame
 
+
+def game_loop(screen, player_sprite):
+
+    # SHOW THE PLAYER
+    screen.blit(player_sprite, (720, 450))    
+
+
+
+### DO NOT EDIT BELOW THIS LINE YET ###
 def make_game():
     pygame.init()
     pygame.display.set_caption("Python adventure")
@@ -26,12 +35,6 @@ def draw_map(game_map, screen):
         for x,y,sprite in layer.tiles():
             screen.blit(sprite, (x * sprite.get_width(), y * sprite.get_height()))
 
-
-def game_loop(screen, player_sprite):
-
-    # SHOW THE PLAYER
-    screen.blit(player_sprite, (720, 450))
-    
 
 if __name__ == '__main__':
     make_game()
