@@ -1,10 +1,18 @@
 import pygame
 from pytmx.util_pygame import load_pygame
 
+player_x = 720
+player_y = 450
+
 
 def game_loop():
     ### ENTER YOUR CODE HERE ###
-    draw_player(720, 450)
+
+    global player_x, player_y
+
+    player_x = player_x - 1
+
+    draw_player(player_x, player_y)
 
 
 ### DO NOT EDIT BELOW THIS LINE YET ###
