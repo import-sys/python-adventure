@@ -17,15 +17,28 @@ def game_loop():
 
     global player_x, player_y
 
-    player_speed_x = 1
-    player_speed_y = 1
+    player_speed_x = 0
+    player_speed_y = 0
 
+    if left_pressed():
+        player_speed_x = -1
+    elif right_pressed():
+        player_speed_x = 1
+
+    if up_pressed():
+        player_speed_y = -1
+    elif down_pressed():
+        player_speed_y = 1
 
     if player_x >= 0 and player_x + player_width <= screen_width:
         player_x = player_x + player_speed_x
+    else:
+        print("Going offscreen")
 
     if player_y >= 0 and player_y + player_height <= screen_height:
         player_y = player_y + player_speed_y
+    else:
+        print("Going offscreen")
 
     draw_player(player_x, player_y)
 
