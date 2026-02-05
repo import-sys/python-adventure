@@ -11,6 +11,12 @@ screen_height = 640
 player_width = 16
 player_height = 16
 
+npcs = [
+    ["Alice", 305, 405],
+    ["Bob", 160, 375],
+    ["John", 450, 250]
+]
+
 
 def game_loop():
     ### ENTER YOUR CODE HERE ###
@@ -41,6 +47,10 @@ def game_loop():
         print("Going offscreen")
 
     draw_player(player_x, player_y)
+
+    for npc in npcs:
+        draw_rectangle(npc[1], npc[2], 16, 16, "blue")
+        draw_text(npc[0], npc[1], npc[2] - 10, "red")
 
 
 ### DO NOT EDIT BELOW THIS LINE YET ###
