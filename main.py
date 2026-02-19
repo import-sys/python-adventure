@@ -1,6 +1,8 @@
 import pygame
 from pytmx.util_pygame import load_pygame
 
+import math
+
 screen_width = 800
 screen_height = 640
 
@@ -13,15 +15,44 @@ player = {
 }
 
 npcs = [
-    {"name": "Alice", "x": 305, "y": 405},
-    {"name": "Bob", "x": 160, "y": 375},
-    {"name": "John", "x": 450, "y": 250},
+        {"name": "Alice", "x": 305, "y": 405, "color": "yellow", "role": "guard", "radius": 40, "size": 16},
+        {"name": "Bob", "x": 160, "y": 375, "color": "green", "role": "guard", "radius": 40, "size": 16},
+        {"name": "John", "x": 450, "y": 250, "color": "blue", "role": "questgiver", "radius": 20, "size": 16},
 ]
+
+
+def get_rectangle_center(x, y, width, height):
+    center_x = x + width / 2
+    center_y = y + height / 2
+
+    center_point = {
+        "x": center_x,
+        "y": center_y
+    }
+
+    return center_point
+
+
+def get_distance_between_points(point1, point2):
+    dx = point1["x"] - point2["x"]
+    dy = point1["y"] - point2["y"]
+
+    distance = math.sqrt(dx * dx + dy * dy)
+
+    return distance
+
+
+def player_in_npc_radius(player, npc):
+    player_center = get_rectangle_center(player["x"], player["y"], player["size"], player["size"])
+    npc_center = get_rectangle_center(npc["x"], npc["y"], npc["size"], npc["size"])
+
+    distance = get_distance_between_points(player_center, npc_center)
+
+    return distance <= npc["radius"]
 
 
 def game_loop():
     ### ENTER YOUR CODE HERE ###
-
     player["speed_x"] = 0
     player["speed_y"] = 0
 
@@ -48,8 +79,17 @@ def game_loop():
     draw_player(player["x"], player["y"])
 
     for npc in npcs:
-        draw_rectangle(npc["x"], npc["y"], 16, 16, "blue")
+        draw_rectangle(npc["x"], npc["y"], 16, 16, npc["color"])
         draw_text(npc["name"], npc["x"], npc["y"] - 10, "red")
+
+    for npc in npcs:
+        if player_in_npc_radius(player, npc):
+            if npc["role"] == "questgiver":
+                if is_key_pressed(pygame.K_e):
+                    print("Hello, adventurer! Your quest is to have fun!")
+            if npc["role"] == "guard":
+                npc["color"] = "red"
+                print("You shall not pass!")
 
 
 ### DO NOT EDIT BELOW THIS LINE YET ###
