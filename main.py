@@ -54,26 +54,55 @@ class NPC(GameObject):
     color = "green"
     radius = 40
 
-    def __init__(self, name, role, x, y):
+    def __init__(self, name, x, y, image):
 
-        super().__init__(
-            x, y, "assets/guard.png" if role == "guard" else "assets/questgiver.png"
-        )
+        super().__init__(x, y, image)
 
         self.name = name
-        self.role = role
 
     def draw(self, screen):
         super().draw(screen)
         draw_text(self.name, self.x, self.y - 10, self.color)
 
+    def player_in_radius(self, player):
+        player_center = get_rectangle_center(
+            player.x, player.y, player.size, player.size
+        )
+        npc_center = get_rectangle_center(self.x, self.y, self.size, self.size)
+
+        distance = get_distance_between_points(player_center, npc_center)
+
+        return distance <= self.radius
+
+    def react_to_player(self, player):
+        pass
+
+
+class Guard(NPC):
+    def __init__(self, name, x, y):
+        super().__init__(name, x, y, "assets/guard.png")
+
+    def react_to_player(self, player):
+        if self.player_in_radius(player):
+            self.color = "red"
+            print("You shall not pass!")
+
+
+class QuestGiver(NPC):
+    def __init__(self, name, x, y):
+        super().__init__(name, x, y, "assets/questgiver.png")
+
+    def react_to_player(self, player):
+        if self.player_in_radius(player):
+            if is_key_pressed(pygame.K_e):
+                print("Hello, adventurer! Your quest is to have fun!")
+
 
 player = Player(720, 450)
-
 npcs = [
-    NPC("Alice", "guard", 305, 405),
-    NPC("Bob", "guard", 160, 375),
-    NPC("John", "questgiver", 450, 250),
+    Guard("Alice", 305, 405),
+    Guard("Bob", 160, 375),
+    QuestGiver("John", 450, 250),
 ]
 
 
@@ -93,15 +122,6 @@ def get_distance_between_points(point1, point2):
     distance = math.sqrt(dx * dx + dy * dy)
 
     return distance
-
-
-def player_in_npc_radius(player, npc):
-    player_center = get_rectangle_center(player.x, player.y, player.size, player.size)
-    npc_center = get_rectangle_center(npc.x, npc.y, npc.size, npc.size)
-
-    distance = get_distance_between_points(player_center, npc_center)
-
-    return distance <= npc.radius
 
 
 def game_loop():
@@ -124,21 +144,12 @@ def game_loop():
 
     for npc in npcs:
         npc.draw(screen)
-
-    for npc in npcs:
-        if player_in_npc_radius(player, npc):
-            if npc.role == "questgiver":
-                if is_key_pressed(pygame.K_e):
-                    print("Hello, adventurer! Your quest is to have fun!")
-            if npc.role == "guard":
-                npc.color = "red"
-                print("You shall not pass!")
+        npc.react_to_player(player)
 
 
 ### DO NOT EDIT BELOW THIS LINE YET ###
 
 pygame.init()
-player_sprite = pygame.image.load("assets/character.png")
 pygame.display.set_caption("Python adventure")
 screen = pygame.display.set_mode((800, 640), pygame.RESIZABLE | pygame.SCALED)
 
