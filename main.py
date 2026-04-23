@@ -54,6 +54,10 @@ class NPC(GameObject):
     color = "green"
     radius = 40
 
+    @classmethod
+    def descrease_spot_radius(cls):
+        cls.radius = cls.radius // 2
+
     def __init__(self, name, x, y, image):
 
         super().__init__(x, y, image)
@@ -65,17 +69,28 @@ class NPC(GameObject):
         draw_text(self.name, self.x, self.y - 10, self.color)
 
     def player_in_radius(self, player):
-        player_center = get_rectangle_center(
+        player_center = GeometryUtils.get_rectangle_center(
             player.x, player.y, player.size, player.size
         )
-        npc_center = get_rectangle_center(self.x, self.y, self.size, self.size)
+        npc_center = GeometryUtils.get_rectangle_center(
+            self.x, self.y, self.size, self.size
+        )
 
-        distance = get_distance_between_points(player_center, npc_center)
+        distance = GeometryUtils.get_distance_between_points(player_center, npc_center)
 
         return distance <= self.radius
 
     def react_to_player(self, player):
         pass
+
+    def debug_radius_circle(self, screen):
+        npc_center = GeometryUtils.get_rectangle_center(
+            self.x, self.y, self.size, self.size
+        )
+
+        pygame.draw.circle(
+            screen, self.color, (npc_center["x"], npc_center["y"]), self.radius, 1
+        )
 
 
 class Guard(NPC):
@@ -89,13 +104,35 @@ class Guard(NPC):
 
 
 class QuestGiver(NPC):
+
     def __init__(self, name, x, y):
         super().__init__(name, x, y, "assets/questgiver.png")
+        self.radius = 40
 
     def react_to_player(self, player):
         if self.player_in_radius(player):
             if is_key_pressed(pygame.K_e):
                 print("Hello, adventurer! Your quest is to have fun!")
+
+
+class GeometryUtils:
+    @staticmethod
+    def get_rectangle_center(x, y, width, height):
+        center_x = x + width / 2
+        center_y = y + height / 2
+
+        center_point = {"x": center_x, "y": center_y}
+
+        return center_point
+
+    @staticmethod
+    def get_distance_between_points(point1, point2):
+        dx = point1["x"] - point2["x"]
+        dy = point1["y"] - point2["y"]
+
+        distance = math.sqrt(dx * dx + dy * dy)
+
+        return distance
 
 
 player = Player(720, 450)
@@ -105,26 +142,11 @@ npcs = [
     QuestGiver("John", 450, 250),
 ]
 
-
-def get_rectangle_center(x, y, width, height):
-    center_x = x + width / 2
-    center_y = y + height / 2
-
-    center_point = {"x": center_x, "y": center_y}
-
-    return center_point
-
-
-def get_distance_between_points(point1, point2):
-    dx = point1["x"] - point2["x"]
-    dy = point1["y"] - point2["y"]
-
-    distance = math.sqrt(dx * dx + dy * dy)
-
-    return distance
+NPC.descrease_spot_radius()
 
 
 def game_loop():
+
     ### ENTER YOUR CODE HERE ###
     player.reset_velocity()
 
@@ -145,6 +167,7 @@ def game_loop():
     for npc in npcs:
         npc.draw(screen)
         npc.react_to_player(player)
+        npc.debug_radius_circle(screen)
 
 
 ### DO NOT EDIT BELOW THIS LINE YET ###
@@ -175,10 +198,6 @@ def draw_map(game_map, screen):
     for layer in game_map.layers:
         for x, y, sprite in layer.tiles():
             screen.blit(sprite, (x * sprite.get_width(), y * sprite.get_height()))
-
-
-def draw_player(x, y):
-    screen.blit(player_sprite, (x, y))
 
 
 def draw_text(text, x, y, color):
