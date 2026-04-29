@@ -6,134 +6,11 @@ from pytmx.util_pygame import load_pygame
 screen_width = 800
 screen_height = 640
 
-
-class GameObject:
-    def __init__(self, x, y, image):
-        self.x = x
-        self.y = y
-        self.size = 16
-        self.sprite = pygame.image.load(image)
-
-    def draw(self, screen):
-        screen.blit(self.sprite, (self.x, self.y))
-
-
-class Player(GameObject):
-    def __init__(self, x, y):
-
-        super().__init__(x, y, "assets/character.png")
-
-        self.__speed_x = 0
-        self.__speed_y = 0
-
-    def move(self, screen_width, screen_height):
-        if self.x >= 0 and self.x + self.size <= screen_width:
-            self.x += self.__speed_x
-
-        if self.y >= 0 and self.y + self.size <= screen_height:
-            self.y += self.__speed_y
-
-    def reset_velocity(self):
-        self.__speed_x = 0
-        self.__speed_y = 0
-
-    def accelerate_left(self):
-        self.__speed_x = -1
-
-    def accelerate_right(self):
-        self.__speed_x = 1
-
-    def accelerate_up(self):
-        self.__speed_y = -1
-
-    def accelerate_down(self):
-        self.__speed_y = 1
-
-
-class NPC(GameObject):
-    color = "green"
-    radius = 40
-
-    @classmethod
-    def descrease_spot_radius(cls):
-        cls.radius = cls.radius // 2
-
-    def __init__(self, name, x, y, image):
-
-        super().__init__(x, y, image)
-
-        self.name = name
-
-    def draw(self, screen):
-        super().draw(screen)
-        draw_text(self.name, self.x, self.y - 10, self.color)
-
-    def player_in_radius(self, player):
-        player_center = GeometryUtils.get_rectangle_center(
-            player.x, player.y, player.size, player.size
-        )
-        npc_center = GeometryUtils.get_rectangle_center(
-            self.x, self.y, self.size, self.size
-        )
-
-        distance = GeometryUtils.get_distance_between_points(player_center, npc_center)
-
-        return distance <= self.radius
-
-    def react_to_player(self, player):
-        pass
-
-    def debug_radius_circle(self, screen):
-        npc_center = GeometryUtils.get_rectangle_center(
-            self.x, self.y, self.size, self.size
-        )
-
-        pygame.draw.circle(
-            screen, self.color, (npc_center["x"], npc_center["y"]), self.radius, 1
-        )
-
-
-class Guard(NPC):
-    def __init__(self, name, x, y):
-        super().__init__(name, x, y, "assets/guard.png")
-
-    def react_to_player(self, player):
-        if self.player_in_radius(player):
-            self.color = "red"
-            print("You shall not pass!")
-
-
-class QuestGiver(NPC):
-
-    def __init__(self, name, x, y):
-        super().__init__(name, x, y, "assets/questgiver.png")
-        self.radius = 40
-
-    def react_to_player(self, player):
-        if self.player_in_radius(player):
-            if is_key_pressed(pygame.K_e):
-                print("Hello, adventurer! Your quest is to have fun!")
-
-
-class GeometryUtils:
-    @staticmethod
-    def get_rectangle_center(x, y, width, height):
-        center_x = x + width / 2
-        center_y = y + height / 2
-
-        center_point = {"x": center_x, "y": center_y}
-
-        return center_point
-
-    @staticmethod
-    def get_distance_between_points(point1, point2):
-        dx = point1["x"] - point2["x"]
-        dy = point1["y"] - point2["y"]
-
-        distance = math.sqrt(dx * dx + dy * dy)
-
-        return distance
-
+from gameobjects.npc import NPC
+from gameobjects.npcs.guard import Guard
+from gameobjects.npcs.questgiver import QuestGiver
+from gameobjects.player import Player
+from utils import DrawUtils, InputUtils
 
 player = Player(720, 450)
 npcs = [
@@ -150,14 +27,14 @@ def game_loop():
     ### ENTER YOUR CODE HERE ###
     player.reset_velocity()
 
-    if left_pressed():
+    if InputUtils.left_pressed():
         player.accelerate_left()
-    elif right_pressed():
+    elif InputUtils.right_pressed():
         player.accelerate_right()
 
-    if up_pressed():
+    if InputUtils.up_pressed():
         player.accelerate_up()
-    elif down_pressed():
+    elif InputUtils.down_pressed():
         player.accelerate_down()
 
     player.move(screen_width, screen_height)
@@ -185,50 +62,13 @@ def make_game():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-        draw_map(game_map, screen)
+        DrawUtils.draw_map(game_map, screen)
         game_loop()
 
         pygame.display.flip()
         clock.tick(60)
 
     pygame.quit()
-
-
-def draw_map(game_map, screen):
-    for layer in game_map.layers:
-        for x, y, sprite in layer.tiles():
-            screen.blit(sprite, (x * sprite.get_width(), y * sprite.get_height()))
-
-
-def draw_text(text, x, y, color):
-    font = pygame.font.SysFont("Arial", 8)
-    drawable = font.render(text, False, color)
-    screen.blit(drawable, (x, y))
-
-
-def draw_rectangle(x, y, w, h, color):
-    pygame.draw.rect(screen, color, (x, y, w, h))
-
-
-def is_key_pressed(key):
-    keys = pygame.key.get_pressed()
-    return keys[key]
-
-
-def left_pressed():
-    return is_key_pressed(pygame.K_a)
-
-
-def right_pressed():
-    return is_key_pressed(pygame.K_d)
-
-
-def up_pressed():
-    return is_key_pressed(pygame.K_w)
-
-
-def down_pressed():
-    return is_key_pressed(pygame.K_s)
 
 
 if __name__ == "__main__":
