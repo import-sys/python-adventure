@@ -8,5 +8,5 @@ class GameObject:
         self.size = 16
         self.sprite = pygame.image.load(image)
 
-    def draw(self, screen):
-        screen.blit(self.sprite, (self.x, self.y))
+    def draw(self, screen, camera):
+        screen.blit(self.sprite, (self.x - camera.x, self.y - camera.y))

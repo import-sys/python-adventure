@@ -25,14 +25,20 @@ class GeometryUtils:
 
 class DrawUtils:
     @staticmethod
-    def draw_map(game_map, screen):
+    def draw_map(game_map, screen, camera):
         for layer in game_map.layers:
             for x, y, sprite in layer.tiles():
-                screen.blit(sprite, (x * sprite.get_width(), y * sprite.get_height()))
+                screen.blit(
+                    sprite,
+                    (
+                        x * sprite.get_width() - camera.x,
+                        y * sprite.get_height() - camera.y,
+                    ),
+                )
 
     @staticmethod
     def draw_text(screen, text, x, y, color):
-        font = pygame.font.SysFont("Arial", 8)
+        font = pygame.font.SysFont("JetBrainsMonoNerdFont", 8)
         drawable = font.render(text, False, color)
         screen.blit(drawable, (x, y))
 

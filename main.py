@@ -1,16 +1,19 @@
-import math
-
 import pygame
 from pytmx.util_pygame import load_pygame
 
-screen_width = 800
-screen_height = 640
-
-from gameobjects.npc import NPC
+from camera import Camera
 from gameobjects.npcs.guard import Guard
 from gameobjects.npcs.questgiver import QuestGiver
 from gameobjects.player import Player
 from utils import DrawUtils, InputUtils
+
+map_width = 800
+map_height = 640
+
+scale_factor = 3
+
+screen_width = map_width // scale_factor
+screen_height = map_height // scale_factor
 
 player = Player(720, 450)
 npcs = [
@@ -19,11 +22,10 @@ npcs = [
     QuestGiver("John", 450, 250),
 ]
 
-NPC.descrease_spot_radius()
+camera = Camera(0, 0, screen_width, screen_height, map_width, map_height)
 
 
 def game_loop():
-
     ### ENTER YOUR CODE HERE ###
     player.reset_velocity()
 
@@ -37,21 +39,24 @@ def game_loop():
     elif InputUtils.down_pressed():
         player.accelerate_down()
 
-    player.move(screen_width, screen_height)
+    player.move(map_width, map_height)
 
-    player.draw(screen)
+    player.draw(screen, camera)
 
     for npc in npcs:
-        npc.draw(screen)
+        npc.draw(screen, camera)
         npc.react_to_player(player)
-        npc.debug_radius_circle(screen)
+
+    camera.follow(player)
 
 
 ### DO NOT EDIT BELOW THIS LINE YET ###
 
 pygame.init()
 pygame.display.set_caption("Python adventure")
-screen = pygame.display.set_mode((800, 640), pygame.RESIZABLE | pygame.SCALED)
+screen = pygame.display.set_mode(
+    (screen_width, screen_height), pygame.RESIZABLE | pygame.SCALED
+)
 
 
 def make_game():
@@ -62,7 +67,7 @@ def make_game():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-        DrawUtils.draw_map(game_map, screen)
+        DrawUtils.draw_map(game_map, screen, camera)
         game_loop()
 
         pygame.display.flip()

@@ -18,10 +18,12 @@ class NPC(GameObject):
 
         self.name = name
 
-    def draw(self, screen):
-        super().draw(screen)
+    def draw(self, screen, camera):
+        super().draw(screen, camera)
 
-        DrawUtils.draw_text(screen, self.name, self.x, self.y - 10, self.color)
+        DrawUtils.draw_text(
+            screen, self.name, self.x - camera.x, self.y - 10 - camera.y, self.color
+        )
 
     def player_in_radius(self, player):
         player_center = GeometryUtils.get_rectangle_center(
