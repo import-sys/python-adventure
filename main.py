@@ -13,7 +13,7 @@ map_height = 640
 scale_factor = 3
 
 screen_width = map_width // scale_factor
-screen_height = map_height // scale_factor
+screen_height = screen_width / 1.78
 
 player = Player(720, 450)
 npcs = [
