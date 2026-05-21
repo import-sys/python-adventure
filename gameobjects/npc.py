@@ -15,8 +15,12 @@ class NPC(GameObject):
     def __init__(self, name, x, y, image):
 
         super().__init__(x, y, image)
-
+        self.idle_animation = None
         self.name = name
+
+    def update(self, dt):
+        if self.idle_animation is not None:
+            self.sprite = self.idle_animation.play(dt)
 
     def draw(self, screen, camera):
         super().draw(screen, camera)

@@ -10,3 +10,6 @@ class GameObject:
 
     def draw(self, screen, camera):
         screen.blit(self.sprite, (self.x - camera.x, self.y - camera.y))
+
+    def update(self, dt):
+        pass

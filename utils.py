@@ -68,3 +68,25 @@ class InputUtils:
     @staticmethod
     def down_pressed():
         return InputUtils.is_key_pressed(pygame.K_s)
+
+
+class SpritesheetLoader:
+    def __init__(self, spritesheet, frame_width, frame_height):
+        self.spritesheet = pygame.image.load(spritesheet)
+        self.frame_width = frame_width
+        self.frame_height = frame_height
+
+    def get_frame(self, row_id, frame_id):
+        x_offset = frame_id * self.frame_width
+        y_offset = row_id * self.frame_height
+
+        return self.spritesheet.subsurface(
+            (x_offset, y_offset, self.frame_width, self.frame_height)
+        )
+
+    def get_row(self, row_id, frames_count):
+        frames = []
+        for frame_id in range(0, frames_count):
+            frames.append(self.get_frame(row_id, frame_id))
+
+        return frames

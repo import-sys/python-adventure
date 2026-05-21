@@ -25,25 +25,15 @@ npcs = [
 camera = Camera(0, 0, screen_width, screen_height, map_width, map_height)
 
 
-def game_loop():
+def game_loop(dt):
     ### ENTER YOUR CODE HERE ###
-    player.reset_velocity()
 
-    if InputUtils.left_pressed():
-        player.accelerate_left()
-    elif InputUtils.right_pressed():
-        player.accelerate_right()
-
-    if InputUtils.up_pressed():
-        player.accelerate_up()
-    elif InputUtils.down_pressed():
-        player.accelerate_down()
-
+    player.update(dt)
     player.move(map_width, map_height)
-
     player.draw(screen, camera)
 
     for npc in npcs:
+        npc.update(dt)
         npc.draw(screen, camera)
         npc.react_to_player(player)
 
@@ -68,7 +58,7 @@ def make_game():
             if event.type == pygame.QUIT:
                 running = False
         DrawUtils.draw_map(game_map, screen, camera)
-        game_loop()
+        game_loop(clock.get_time())
 
         pygame.display.flip()
         clock.tick(60)
